@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Technical portfolio of Andrew Zamaripa: infrastructure, security, and automation case studies.">
+<title>Andrew Zamaripa Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single reading column styled like an engineering change record. Each case study is a "record" with a status chip, a facts rail, and one diagram. */
+:root{
+  --bg:#F5F6F4; --surface:#FFFFFF; --ink:#15202A; --muted:#55626D; --line:#D7DCDD;
+  --accent:#0E6B66; --accent-soft:#DCEDEB; --warn:#9A5B00; --warn-soft:#F6EAD6; --prod:#E9ECEA;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F151A; --surface:#161E25; --ink:#E6EBEE; --muted:#9AA7B1; --line:#2A353E;
+  --accent:#4FC1B8; --accent-soft:#16332F; --warn:#E3A44B; --warn-soft:#33270F; --prod:#1E2830; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F151A; --surface:#161E25; --ink:#E6EBEE; --muted:#9AA7B1; --line:#2A353E;
+  --accent:#4FC1B8; --accent-soft:#16332F; --warn:#E3A44B; --warn-soft:#33270F; --prod:#1E2830; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0}
+.wrap{max-width:900px;margin:0 auto;padding-inline:20px;padding-block:48px 72px}
+h1,h2,h3{font-family:var(--display);font-stretch:85%;text-wrap:balance;margin:0;line-height:1.1}
+p{margin:0}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+a{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* masthead */
+.mast{display:grid;gap:18px;padding-bottom:32px;border-bottom:2px solid var(--ink)}
+.mast h1{font-size:clamp(40px,8vw,68px);font-weight:800;letter-spacing:-.01em}
+.mast .role{font-family:var(--display);font-stretch:90%;font-size:clamp(18px,3vw,22px);font-weight:600;color:var(--accent)}
+.mast .lede{max-width:64ch;color:var(--ink);font-size:17px}
+.contact{display:flex;flex-wrap:wrap;gap:6px 20px;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.contact span{user-select:all}
+
+/* production band */
+.band{margin-top:28px;display:grid;gap:8px}
+.band svg{width:100%;height:auto;display:block}
+.band .cap{font-size:13px;color:var(--muted);max-width:70ch}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:32px}
+.stat{background:var(--surface);padding:16px 18px;display:grid;gap:2px}
+.stat b{font-family:var(--display);font-stretch:85%;font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted);line-height:1.35}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* index */
+.index{margin-top:44px;display:grid;gap:10px}
+.index ol{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--line)}
+.index li{border-bottom:1px solid var(--line)}
+.index a{display:grid;grid-template-columns:3.2em 1fr auto;gap:12px;align-items:baseline;padding:10px 0;text-decoration:none;color:var(--ink)}
+.index a:hover .t{color:var(--accent)}
+.index .n{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.index .t{font-weight:600}
+
+/* records */
+.record{margin-top:64px;display:grid;gap:22px}
+.rec-head{display:grid;gap:10px;padding-top:14px;border-top:2px solid var(--ink)}
+.rec-meta{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.rec-head h2{font-size:clamp(28px,5vw,40px);font-weight:750}
+.rec-head .sum{font-size:17px;max-width:66ch}
+.chip{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:3px}
+.chip.done{background:var(--accent-soft);color:var(--accent)}
+.chip.wip{background:var(--warn-soft);color:var(--warn)}
+.rec-body{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:32px}
+@media (max-width:760px){.rec-body{grid-template-columns:minmax(0,1fr)}}
+.prose{display:grid;gap:18px;min-width:0}
+.prose h3{font-size:15px;font-family:var(--mono);font-stretch:100%;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.prose .blk{display:grid;gap:6px}
+.prose ul{margin:0;padding-left:1.1em;display:grid;gap:4px}
+.prose li::marker{color:var(--accent)}
+.rail{display:grid;gap:14px;align-content:start;font-size:14px;min-width:0}
+.rail dl{margin:0;display:grid;gap:12px;padding:16px;background:var(--surface);border:1px solid var(--line)}
+.rail dt{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.rail dd{margin:2px 0 0;font-variant-numeric:tabular-nums}
+.rail dd b{font-family:var(--display);font-stretch:85%;font-size:24px;font-weight:700;display:block;line-height:1.15}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);padding:2px 7px;border-radius:3px;color:var(--muted)}
+
+figure{margin:0;background:var(--surface);border:1px solid var(--line);padding:18px;display:grid;gap:10px}
+figure .scroll{overflow-x:auto}
+figure svg{display:block;width:100%;min-width:620px;height:auto}
+figcaption{font-size:13px;color:var(--muted)}
+svg text{font-family:var(--mono);font-size:12px;fill:var(--ink)}
+svg .sm{font-size:10.5px;fill:var(--muted)}
+svg .box{fill:var(--surface);stroke:var(--ink);stroke-width:1.2}
+svg .box.acc{fill:var(--accent-soft);stroke:var(--accent)}
+svg .box.dim{fill:var(--prod);stroke:var(--line)}
+svg .box.warn{fill:var(--warn-soft);stroke:var(--warn)}
+svg .ln{stroke:var(--ink);stroke-width:1.3;fill:none}
+svg .ln.acc{stroke:var(--accent)}
+svg .ln.dash{stroke-dasharray:4 4;stroke:var(--muted)}
+svg .arrow{fill:var(--ink)}
+svg .arrow.acc{fill:var(--accent)}
+svg .prodfill{fill:var(--prod)}
+svg .winfill{fill:var(--accent-soft);stroke:var(--accent)}
+svg .tick{stroke:var(--line)}
+
+/* other work */
+.other{margin-top:72px;display:grid;gap:20px;padding-top:14px;border-top:2px solid var(--ink)}
+.other h2{font-size:clamp(26px,4.5vw,36px);font-weight:750}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+@media (max-width:640px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.cell{background:var(--surface);padding:18px;display:grid;gap:8px;align-content:start}
+.cell h3{font-size:20px;font-weight:700}
+.cell p{font-size:15px;color:var(--ink)}
+.stack{display:grid;gap:10px}
+.stack .row{display:grid;grid-template-columns:170px minmax(0,1fr);gap:16px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+@media (max-width:560px){.stack .row{grid-template-columns:minmax(0,1fr);gap:2px}}
+.foot{margin-top:56px;font-size:13px;color:var(--muted);max-width:72ch;display:grid;gap:8px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+html{scroll-behavior:smooth}
+@media print{figure svg{min-width:0}.rec-body{grid-template-columns:minmax(0,1fr) 190px;gap:22px}.stats{grid-template-columns:repeat(4,minmax(0,1fr))}.wrap{padding-block:0}.record,.other{break-inside:auto}figure{break-inside:avoid}.rec-head{break-after:avoid}}
+</style>
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+<header class="mast">
+  <span class="label">Technical portfolio · Selected work 2025–2026</span>
+  <h1>Andrew Zamaripa</h1>
+  <p class="role">Systems Administrator &amp; IT Operations Lead · Infrastructure, Security, Automation</p>
+  <p class="lede">When the IT director left, I took over IT for a multi-site food manufacturer and moved it from MSP-dependent to company-owned. Today I run ~300 endpoints across two sites, production lines that operate 20 hours a day, and a ~$110K annual equipment budget. I report to the CFO and manage a two-person team. I lead from a technical SME perspective, so I’m hands-on in every project below: the problem, the decisions, and where it stands today.</p>
+  <div class="contact">
+    <span>andrewgerard75@gmail.com</span>
+    <span>linkedin.com/in/andrew-zamaripa-8827462ba</span>
+    <span>Dallas, TX</span>
+  </div>
+
+  <div class="band" aria-label="Production schedule">
+    <svg viewBox="0 0 860 74" role="img" aria-label="Production runs 4 AM to midnight; the midnight to 4 AM gap is the only window for disruptive change">
+      <rect x="10" y="22" width="840" height="26" class="prodfill"/>
+      <rect x="10" y="22" width="140" height="26" class="winfill"/>
+      <text x="80" y="39" text-anchor="middle" style="font-size:11px">change window</text>
+      <text x="500" y="39" text-anchor="middle" style="font-size:11px">production lines running, Mon–Fri</text>
+      <g class="sm">
+        <line x1="10" y1="48" x2="10" y2="56" class="tick"/><text x="10" y="68" class="sm" text-anchor="start">12 AM</text>
+        <line x1="150" y1="48" x2="150" y2="56" class="tick"/><text x="150" y="68" class="sm" text-anchor="middle">4 AM</text>
+        <line x1="430" y1="48" x2="430" y2="56" class="tick"/><text x="430" y="68" class="sm" text-anchor="middle">12 PM</text>
+        <line x1="710" y1="48" x2="710" y2="56" class="tick"/><text x="710" y="68" class="sm" text-anchor="middle">8 PM</text>
+        <line x1="850" y1="48" x2="850" y2="56" class="tick"/><text x="850" y="68" class="sm" text-anchor="end">12 AM</text>
+      </g>
+      <text x="10" y="14" class="sm">24-HOUR WEEKDAY</text>
+    </svg>
+    <p class="cap">The constraint behind every decision here: production runs about 20 hours a day, five days a week. Cutovers, backups, and reboots have to fit around the lines.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b>~300</b><span>endpoints across two Dallas sites</span></div>
+    <div class="stat"><b>&lt;60 days</b><span>MSP exit to company-owned stack</span></div>
+    <div class="stat"><b>~$40K/yr</b><span>lower cost than the MSP-owned model</span></div>
+    <div class="stat"><b>0</b><span>production disruptions during the transition</span></div>
+  </div>
+</header>
+
+<nav class="index" aria-label="Case studies">
+  <span class="label">Case studies</span>
+  <ol>
+    <li><a href="#msp"><span class="n">CS-01</span><span class="t">MSP exit and endpoint migration automation</span><span class="chip done">Delivered</span></a></li>
+    <li><a href="#mail"><span class="n">CS-02</span><span class="t">Email security cutover to Proofpoint</span><span class="chip done">Delivered</span></a></li>
+    <li><a href="#refresh"><span class="n">CS-03</span><span class="t">Virtualization and storage refresh</span><span class="chip wip">Migration underway</span></a></li>
+    <li><a href="#dr"><span class="n">CS-04</span><span class="t">Backup and recovery modernization</span><span class="chip wip">Local tier underway</span></a></li>
+    <li><a href="#label"><span class="n">CS-05</span><span class="t">On-prem production labeling integration</span><span class="chip wip">Built, acceptance pending</span></a></li>
+    <li><a href="#more"><span class="n">+</span><span class="t">Data platform, networking, service management, identity</span><span></span></a></li>
+  </ol>
+</nav>
+
+<!-- CS-01 -->
+<section class="record" id="msp">
+  <div class="rec-head">
+    <div class="rec-meta"><span class="label">CS-01 · Security operations · Vendor strategy</span><span class="chip done">Delivered</span></div>
+    <h2>MSP exit and endpoint migration automation</h2>
+    <p class="sum">I moved the company from an MSP-owned security and management model to tooling the company owns, in under 60 days, with no production impact. To get there I wrote an unattended migration that swapped management agents on every endpoint without dropping EDR protection.</p>
+  </div>
+  <div class="rec-body">
+    <div class="prose">
+      <div class="blk"><h3>Problem</h3><p>The MSP owned the RMM, EDR, and backup tenants. That meant limited visibility, persistent third-party access, and cost that grew with headcount. After the IT director left, the company needed control of its own environment without adding staff.</p></div>
+      <div class="blk"><h3>What I owned</h3><ul>
+        <li>Built the business case: vendor comparison workbooks, topology diagrams, and implementation Gantt charts comparing three models (incumbent MSP, an alternative MSP, and company-owned ConnectWise + Arctic Wolf).</li>
+        <li>Ran negotiations and timed the contracts to lock pricing ahead of a vendor rate increase. Contracts were executed through the CFO.</li>
+        <li>Restructured the incumbent MSP to a break-glass SOW, used for escalation only. Removing its standing access was part of the security decision.</li>
+        <li>Reported bi-weekly red/yellow/green status to the CFO across every workstream.</li></ul>
+      </div>
+      <div class="blk"><h3>Engineering</h3><ul>
+        <li>Unattended migration script: stages installers <em>before</em> removing anything, verifies SHA-256 hashes, removes the legacy agents, installs the new RMM and remote-support clients, then resumes itself after reboot through a scheduled task that deletes itself when finished.</li>
+        <li>Guardrails: SentinelOne is never touched, and the script verifies that exactly one remote-support client is left.</li>
+        <li>Validated on sandbox machines before fleet rollout. Afterwards, built RMM first-check-in packages so new and remote devices get the MDR agent and Sysmon automatically. Installers are hosted in the RMM so laptops off the network still receive them.</li></ul>
+      </div>
+      <figure>
+        <div class="scroll">
+        <svg viewBox="0 0 760 170" role="img" aria-label="Migration script lifecycle">
+          <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="arrow"/></marker></defs>
+          <g>
+            <rect x="10" y="20" width="110" height="46" class="box"/><text x="65" y="40" text-anchor="middle">Stage</text><text x="65" y="56" text-anchor="middle" class="sm">copy installers</text>
+            <rect x="160" y="20" width="110" height="46" class="box"/><text x="215" y="40" text-anchor="middle">Verify</text><text x="215" y="56" text-anchor="middle" class="sm">SHA-256 match</text>
+            <rect x="310" y="20" width="110" height="46" class="box"/><text x="365" y="40" text-anchor="middle">Remove</text><text x="365" y="56" text-anchor="middle" class="sm">legacy agents</text>
+            <rect x="460" y="20" width="110" height="46" class="box"/><text x="515" y="40" text-anchor="middle">Install</text><text x="515" y="56" text-anchor="middle" class="sm">RMM + remote</text>
+            <rect x="610" y="20" width="130" height="46" class="box"/><text x="675" y="40" text-anchor="middle">Reboot</text><text x="675" y="56" text-anchor="middle" class="sm">resume task set</text>
+            <path d="M120 43 H158" class="ln" marker-end="url(#a1)"/><path d="M270 43 H308" class="ln" marker-end="url(#a1)"/><path d="M420 43 H458" class="ln" marker-end="url(#a1)"/><path d="M570 43 H608" class="ln" marker-end="url(#a1)"/>
+            <path d="M675 66 V110 H572" class="ln" marker-end="url(#a1)"/>
+            <rect x="360" y="90" width="210" height="46" class="box acc"/><text x="465" y="110" text-anchor="middle">Post-checks</text><text x="465" y="126" text-anchor="middle" class="sm">RMM online · 1 remote client</text>
+            <path d="M360 113 H252" class="ln" marker-end="url(#a1)"/>
+            <rect x="72" y="90" width="180" height="46" class="box"/><text x="162" y="110" text-anchor="middle">Clean up</text><text x="162" y="126" text-anchor="middle" class="sm">delete resume task</text>
+            <rect x="10" y="148" width="740" height="18" class="box dim"/><text x="380" y="161" text-anchor="middle" class="sm">EDR (SentinelOne) left running and untouched at every step</text>
+          </g>
+        </svg>
+        </div>
+        <figcaption>Script lifecycle. A hash mismatch stops the run before anything is removed, so a failed run leaves the old agent in place.</figcaption>
+      </figure>
+      <div class="blk"><h3>Result</h3><p>The company now owns its RMM/PSA, EDR, MDR, DNS filtering, email security, and backup. Arctic Wolf provides 24/7 MDR. Cost is about $40K a year lower than the MSP-owned option, and the gap grows with headcount. Production saw no disruption. The incumbent MSP no longer has any presence in the company's management tenant.</p></div>
+      <div class="blk"><h3>What I'd keep</h3><p>Stage and verify everything before removing anything. Make every step resumable, and never let the migration touch the security agent.</p></div>
+    </div>
+    <aside class="rail">
+      <dl>
+        <div><dt>Timeline</dt><dd><b>&lt;60 days</b>contract to internal ownership</dd></div>
+        <div><dt>Scope</dt><dd><b>~300</b>endpoints, ~11 VMs, 2 sites</dd></div>
+        <div><dt>Annual cost</dt><dd><b>−$40K</b>vs. MSP-owned model</dd></div>
+        <div><dt>Production impact</dt><dd><b>None</b></dd></div>
+      </dl>
+      <div class="tags"><span>ConnectWise RMM/PSA</span><span>ScreenConnect</span><span>SentinelOne</span><span>Arctic Wolf</span><span>DNSFilter</span><span>PowerShell</span><span>Sysmon</span></div>
+    </aside>
+  </div>
+</section>
+
+<!-- CS-02 -->
+<section class="record" id="mail">
+  <div class="rec-head">
+    <div class="rec-meta"><span class="label">CS-02 · Email security · Change management</span><span class="chip done">Delivered</span></div>
+    <h2>Email security cutover to Proofpoint</h2>
+    <p class="sum">I planned and ran the inbound mail cutover from Microsoft 365 native filtering to Proofpoint, including domain authentication, URL defense, quarantine, and phishing-simulation delivery. A rollback was ready at every step.</p>
+  </div>
+  <div class="rec-body">
+    <div class="prose">
+      <div class="blk"><h3>Problem</h3><p>Email is the company's main attack surface, and the previous setup left filtering and awareness testing in other hands. Partway through the MSP transition I re-evaluated the planned awareness platform. Cost modeling showed Proofpoint covered filtering and training for less money.</p></div>
+      <div class="blk"><h3>Engineering</h3><ul>
+        <li>MX cutover and Microsoft 365 inbound connectors restricted to Proofpoint, so mail can't bypass the filter.</li>
+        <li>SPF, DKIM, and DMARC aligned across sending services. URL defense and quarantine policy configured with user digests.</li>
+        <li>Advanced Delivery settings so phishing simulations reach inboxes without weakening real filtering.</li>
+        <li>Captured the prior configuration before cutover so rollback was a documented, timed procedure.</li>
+        <li>Now integrating Proofpoint with the MDR provider's active-response tooling.</li></ul>
+      </div>
+      <figure>
+        <div class="scroll">
+        <svg viewBox="0 0 760 150" role="img" aria-label="Mail flow after cutover">
+          <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="arrow"/></marker></defs>
+          <rect x="10" y="40" width="120" height="50" class="box dim"/><text x="70" y="62" text-anchor="middle">Internet</text><text x="70" y="78" text-anchor="middle" class="sm">senders</text>
+          <rect x="190" y="30" width="170" height="70" class="box acc"/><text x="275" y="55" text-anchor="middle">Proofpoint</text><text x="275" y="72" text-anchor="middle" class="sm">MX · filtering · URL</text><text x="275" y="86" text-anchor="middle" class="sm">defense · quarantine</text>
+          <rect x="420" y="30" width="160" height="70" class="box"/><text x="500" y="55" text-anchor="middle">Exchange Online</text><text x="500" y="72" text-anchor="middle" class="sm">connector accepts</text><text x="500" y="86" text-anchor="middle" class="sm">Proofpoint only</text>
+          <rect x="640" y="40" width="110" height="50" class="box"/><text x="695" y="62" text-anchor="middle">Users</text><text x="695" y="78" text-anchor="middle" class="sm">mailboxes</text>
+          <path d="M130 65 H188" class="ln" marker-end="url(#a2)"/><path d="M360 65 H418" class="ln" marker-end="url(#a2)"/><path d="M580 65 H638" class="ln" marker-end="url(#a2)"/>
+          <path d="M70 90 V130 H500 V102" class="ln dash"/><text x="285" y="124" text-anchor="middle" class="sm">direct delivery blocked by connector restriction</text>
+          <text x="275" y="18" text-anchor="middle" class="sm">SPF · DKIM · DMARC aligned</text>
+        </svg>
+        </div>
+        <figcaption>Inbound mail flow after cutover. Public domains and test infrastructure are omitted.</figcaption>
+      </figure>
+      <div class="blk"><h3>Result</h3><p>Production inbound mail through Proofpoint was validated after cutover. The company owns its filtering and awareness program, and annual spend is lower than the platform originally planned.</p></div>
+    </div>
+    <aside class="rail">
+      <dl>
+        <div><dt>Change type</dt><dd><b>MX cutover</b>with documented rollback</dd></div>
+        <div><dt>Validation</dt><dd>Production mail flow, authentication results, simulation delivery</dd></div>
+        <div><dt>Selection basis</dt><dd>Cost model of competing quotes</dd></div>
+      </dl>
+      <div class="tags"><span>Proofpoint</span><span>Exchange Online</span><span>SPF</span><span>DKIM</span><span>DMARC</span><span>Arctic Wolf</span></div>
+    </aside>
+  </div>
+</section>
+
+<!-- CS-03 -->
+<section class="record" id="refresh">
+  <div class="rec-head">
+    <div class="rec-meta"><span class="label">CS-03 · Architecture · Capital planning</span><span class="chip wip">Design &amp; procurement complete · migration underway</span></div>
+    <h2>Virtualization and storage refresh</h2>
+    <p class="sum">The SAN was end-of-life, the hosts were aging, and the domain controllers ran Server 2012. I designed the replacement, ran the licensing and options analysis, and drove procurement. I'm now leading the migration.</p>
+  </div>
+  <div class="rec-body">
+    <div class="prose">
+      <div class="blk"><h3>Constraints</h3><ul>
+        <li>Production and ERP-adjacent workloads can't take long outages, so the cutover has to fit the midnight–4 AM window.</li>
+        <li>Windows Server licensing is per core and depends on VM count. Getting it wrong is expensive either way.</li>
+        <li>The platform has to be supportable by a small team, with vendor support behind it.</li></ul>
+      </div>
+      <div class="blk"><h3>Decisions</h3><ul>
+        <li><strong>Two Hyper-V hosts on Windows Server 2025</strong>, 32 physical cores each, sized for the current ~11 VMs plus failover headroom.</li>
+        <li><strong>Lenovo shared storage</strong> replacing the end-of-life SAN, with redundant NICs and power.</li>
+        <li><strong>Licensing modeled before purchase:</strong> Standard vs. Datacenter virtualization rights against VM placement, plus CALs.</li>
+        <li><strong>Proxmox evaluated against Hyper-V</strong> before committing to the platform.</li>
+        <li><strong>Domain controllers will be rebuilt on 2025</strong> rather than hardened in place. I deferred Sysmon on the 2012 DCs to avoid adding risk to systems that are being retired.</li></ul>
+      </div>
+      <figure>
+        <div class="scroll">
+        <svg viewBox="0 0 760 190" role="img" aria-label="Target virtualization architecture">
+          <rect x="20" y="20" width="200" height="90" class="box acc"/><text x="120" y="44" text-anchor="middle">Hyper-V Host A</text><text x="120" y="62" text-anchor="middle" class="sm">Server 2025 · 32 cores</text><text x="120" y="78" text-anchor="middle" class="sm">redundant NIC + PSU</text><text x="120" y="96" text-anchor="middle" class="sm">DC · file · app VMs</text>
+          <rect x="280" y="20" width="200" height="90" class="box acc"/><text x="380" y="44" text-anchor="middle">Hyper-V Host B</text><text x="380" y="62" text-anchor="middle" class="sm">Server 2025 · 32 cores</text><text x="380" y="78" text-anchor="middle" class="sm">redundant NIC + PSU</text><text x="380" y="96" text-anchor="middle" class="sm">DC · print · app VMs</text>
+          <rect x="140" y="140" width="220" height="40" class="box"/><text x="250" y="165" text-anchor="middle">Lenovo shared storage</text>
+          <path d="M120 110 V125 H250 V138" class="ln"/><path d="M380 110 V125 H250" class="ln"/>
+          <rect x="560" y="20" width="180" height="90" class="box dim"/><text x="650" y="44" text-anchor="middle">Retiring</text><text x="650" y="62" text-anchor="middle" class="sm">aging Dell hosts</text><text x="650" y="78" text-anchor="middle" class="sm">end-of-life SAN</text><text x="650" y="94" text-anchor="middle" class="sm">Server 2012 DCs</text>
+          <path d="M558 65 H484" class="ln dash"/><text x="520" y="58" text-anchor="middle" class="sm">migrate</text>
+          <rect x="560" y="140" width="180" height="40" class="box warn"/><text x="650" y="165" text-anchor="middle">Local BDR (CS-04)</text>
+          <path d="M360 160 H558" class="ln dash"/>
+        </svg>
+        </div>
+        <figcaption>Target design. VM placement is planned so either host can carry the critical set during maintenance.</figcaption>
+      </figure>
+      <div class="blk"><h3>Status</h3><p>Hardware is purchased and in fulfillment. Migration sequencing, rollback, and acceptance criteria are defined. I'll add host cutover and SAN retirement dates when production acceptance is complete.</p></div>
+    </div>
+    <aside class="rail">
+      <dl>
+        <div><dt>Hosts</dt><dd><b>2 × 32-core</b>Windows Server 2025 Hyper-V</dd></div>
+        <div><dt>Workloads</dt><dd><b>~11 VMs</b>DCs, file, print, reverse proxy, production apps</dd></div>
+        <div><dt>My role</dt><dd>Design, sizing, licensing, vendor selection, procurement, migration lead</dd></div>
+      </dl>
+      <div class="tags"><span>Hyper-V</span><span>Server 2025</span><span>Active Directory</span><span>Shared storage</span><span>Licensing</span></div>
+    </aside>
+  </div>
+</section>
+
+<!-- CS-04 -->
+<section class="record" id="dr">
+  <div class="rec-head">
+    <div class="rec-meta"><span class="label">CS-04 · Business continuity</span><span class="chip wip">Cloud tier live · local tier underway</span></div>
+    <h2>Backup and recovery modernization</h2>
+    <p class="sum">I brought server backup in-house with Axcient direct-to-cloud protection, scheduled around production. I'm now adding a local recovery appliance on an isolated network so restores don't depend on internet bandwidth.</p>
+  </div>
+  <div class="rec-body">
+    <div class="prose">
+      <div class="blk"><h3>Problem</h3><p>Backups were provider-managed, and some jobs ran into production hours, which hurt reliability. The company needed its own recovery capability, plus a fast local restore path for a plant that can't wait on a cloud download.</p></div>
+      <div class="blk"><h3>Engineering</h3><ul>
+        <li>Axcient x360Recover direct-to-cloud on all servers, live September 2026. Schedules are staggered into non-production hours so jobs don't compete with the lines.</li>
+        <li>Traced recurring failures to VSS errors and to the EDR quarantining backup components. Resolved them with the security and backup vendors without weakening EDR policy.</li>
+        <li>Built a bring-your-own-device BDR appliance on company-supplied server hardware instead of buying a commercial appliance. Racked, initialized, and placed on a dedicated backup VLAN.</li></ul>
+      </div>
+      <figure>
+        <div class="scroll">
+        <svg viewBox="0 0 760 150" role="img" aria-label="Two-tier backup design">
+          <defs><marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="arrow acc"/></marker></defs>
+          <rect x="20" y="45" width="170" height="60" class="box"/><text x="105" y="70" text-anchor="middle">Production servers</text><text x="105" y="88" text-anchor="middle" class="sm">Hyper-V VMs</text>
+          <rect x="300" y="10" width="190" height="56" class="box acc"/><text x="395" y="34" text-anchor="middle">Local BDR</text><text x="395" y="52" text-anchor="middle" class="sm">isolated backup VLAN</text>
+          <rect x="300" y="88" width="190" height="56" class="box acc"/><text x="395" y="112" text-anchor="middle">Axcient cloud</text><text x="395" y="130" text-anchor="middle" class="sm">direct-to-cloud · live</text>
+          <path d="M190 65 H245 V38 H298" class="ln acc" marker-end="url(#a4)"/><path d="M190 85 H245 V116 H298" class="ln acc" marker-end="url(#a4)"/>
+          <rect x="570" y="45" width="170" height="60" class="box dim"/><text x="655" y="70" text-anchor="middle">Restore paths</text><text x="655" y="88" text-anchor="middle" class="sm">local first · cloud DR</text>
+          <path d="M490 38 H530 V65 H568" class="ln dash"/><path d="M490 116 H530 V85 H568" class="ln dash"/>
+        </svg>
+        </div>
+        <figcaption>Target two-tier design. The local tier is still being commissioned.</figcaption>
+      </figure>
+      <div class="blk"><h3>Next evidence</h3><p>Next steps are a documented restore test with measured restore time and achieved RPO/RTO per workload. I'll publish those numbers here when they're measured, not before.</p></div>
+    </div>
+    <aside class="rail">
+      <dl>
+        <div><dt>Cloud tier</dt><dd><b>Live</b>since Sept 2026</dd></div>
+        <div><dt>Local tier</dt><dd>Hardware racked and on the network; job configuration in progress</dd></div>
+        <div><dt>Fixes</dt><dd>VSS failures, EDR/backup conflicts</dd></div>
+      </dl>
+      <div class="tags"><span>Axcient x360Recover</span><span>VSS</span><span>VLAN isolation</span><span>SentinelOne</span><span>BCDR</span></div>
+    </aside>
+  </div>
+</section>
+
+<!-- CS-05 -->
+<section class="record" id="label">
+  <div class="rec-head">
+    <div class="rec-meta"><span class="label">CS-05 · Application integration · Manufacturing</span><span class="chip wip">Built · production acceptance pending</span></div>
+    <h2>On-prem production labeling integration</h2>
+    <p class="sum">Product labels print from a cloud service. The ERP vendor's connector only speaks to that cloud service, so I built an on-prem BarTender environment and my own middleware to give the plant a labeling path that doesn't depend on the cloud.</p>
+  </div>
+  <div class="rec-body">
+    <div class="prose">
+      <div class="blk"><h3>Problem</h3><p>The plant produces about five million egg rolls a week, and every case needs a label. A cloud labeling outage stops shipping. The ERP vendor's connector sends a payload built only for the cloud product, and no vendor offered an on-prem path.</p></div>
+      <div class="blk"><h3>Engineering</h3><ul>
+        <li>Stood up an on-prem BarTender server.</li>
+        <li>Wrote a middleware adapter that accepts the ERP's JSON print requests and translates them into jobs the on-prem BarTender can run.</li>
+        <li>Published the API through IIS Application Request Routing and URL Rewrite with HTTPS and authentication, and configured the firewall to allow it.</li>
+        <li>Validated API reachability (Swagger) from inside and outside the network.</li></ul>
+      </div>
+      <figure>
+        <div class="scroll">
+        <svg viewBox="0 0 760 160" role="img" aria-label="Labeling integration flow">
+          <defs><marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="arrow"/></marker></defs>
+          <rect x="10" y="55" width="140" height="56" class="box"/><text x="80" y="78" text-anchor="middle">Business Central</text><text x="80" y="96" text-anchor="middle" class="sm">cloud ERP</text>
+          <rect x="200" y="8" width="160" height="40" class="box dim"/><text x="280" y="32" text-anchor="middle" class="sm">vendor cloud labeling</text>
+          <path d="M150 70 H175 V28 H198" class="ln dash"/>
+          <rect x="200" y="62" width="150" height="56" class="box"/><text x="275" y="84" text-anchor="middle">IIS reverse proxy</text><text x="275" y="102" text-anchor="middle" class="sm">ARR · HTTPS · auth</text>
+          <rect x="400" y="62" width="150" height="56" class="box acc"/><text x="475" y="84" text-anchor="middle">Adapter</text><text x="475" y="102" text-anchor="middle" class="sm">JSON translation</text>
+          <rect x="600" y="62" width="150" height="56" class="box"/><text x="675" y="84" text-anchor="middle">BarTender</text><text x="675" y="102" text-anchor="middle" class="sm">on-prem server</text>
+          <path d="M150 90 H198" class="ln" marker-end="url(#a5)"/><path d="M350 90 H398" class="ln" marker-end="url(#a5)"/><path d="M550 90 H598" class="ln" marker-end="url(#a5)"/>
+          <rect x="600" y="132" width="150" height="24" class="box dim"/><text x="675" y="148" text-anchor="middle" class="sm">line label printers</text>
+          <path d="M675 118 V130" class="ln"/>
+        </svg>
+        </div>
+        <figcaption>Request path. The dashed line is the vendor's cloud-only route; the solid path is what I built.</figcaption>
+      </figure>
+      <div class="blk"><h3>Status</h3><p>The server, proxy, and adapter are built and reachable. End-to-end production failover testing and vendor acceptance are the remaining steps. I'm not presenting this as a finished replacement until those pass.</p></div>
+    </div>
+    <aside class="rail">
+      <dl>
+        <div><dt>Operation</dt><dd><b>~5M</b>egg rolls per week depend on labeling</dd></div>
+        <div><dt>Gap closed</dt><dd>No vendor connector from cloud ERP to on-prem BarTender</dd></div>
+        <div><dt>Built</dt><dd>Server, reverse proxy, auth, adapter</dd></div>
+      </dl>
+      <div class="tags"><span>BarTender</span><span>IIS ARR</span><span>URL Rewrite</span><span>REST / JSON</span><span>Business Central</span></div>
+    </aside>
+  </div>
+</section>
+
+<!-- Other work -->
+<section class="other" id="more">
+  <span class="label">Also in scope</span>
+  <h2>Data, networking, service, identity</h2>
+  <div class="grid2">
+    <div class="cell"><span class="label">Data platform</span><h3>Microsoft Fabric warehouse</h3><p>I'm the technical owner of a medallion lakehouse feeding Power BI. I was the designated approver on the consultant handoff and flagged missing source control, runbooks, and credential ownership. When pipelines failed on departed contractors' expired tokens, I moved ownership to a hardened service account. I designed Git-backed Dev → Test → Prod promotion and built Business Central, OEE (factory efficiency), and helpdesk ingestion for executive dashboards.</p></div>
+    <div class="cell"><span class="label">Networking</span><h3>Multi-site, segmented</h3><p>I designed the network for a 50,000 sq ft warehouse and run segmented networks that separate user, server, production, IoT, camera, voice, and guest traffic with SonicWall and UniFi ACLs. I built the Addison sales office from an empty room in days (gateway, site-to-site IPsec, access control, AV), restored that tunnel after an IKE identity mismatch, and configured WAN failover on a secondary fiber circuit.</p></div>
+    <div class="cell"><span class="label">Service management</span><h3>SLAs and KPIs from scratch</h3><p>I set up ConnectWise PSA service boards, custom SLAs, and a technician scorecard (target: 5 resolved tickets per tech per day, plus response and resolution SLA), reported through Fabric to the CEO, CFO, and controller. I lead a Jr. Systems Administrator and an IT Technician, manage the ~$110K annual equipment budget, and wrote their reviews, progression plan, and title-change job description.</p></div>
+    <div class="cell"><span class="label">Identity &amp; governance</span><h3>Privileged access, AI policy</h3><p>Admin and service identities are unlicensed, have no mailbox, and require FIDO2 hardware keys. Standing roles were removed from the most-phished user account. I also launched an approved AI tool program with acceptable-use guardrails and a spend and adoption dashboard for executives.</p></div>
+  </div>
+
+  <div class="stack">
+    <span class="label">Stack I run day to day</span>
+    <div class="row"><span class="label">Infrastructure</span><span>Windows Server 2012–2025, Hyper-V, Active Directory, Group Policy, DNS/DHCP, iSCSI SAN/NAS</span></div>
+    <div class="row"><span class="label">Identity &amp; cloud</span><span>Microsoft 365, Entra ID, Exchange Online, Conditional Access, FIDO2, Intune</span></div>
+    <div class="row"><span class="label">Network</span><span>SonicWall, UniFi, VLANs/ACLs, IPsec site-to-site and remote-access VPN</span></div>
+    <div class="row"><span class="label">Security</span><span>SentinelOne, Arctic Wolf, Sysmon, Proofpoint, DNSFilter, Duo</span></div>
+    <div class="row"><span class="label">Automation</span><span>PowerShell, ConnectWise RMM, IIS ARR, REST APIs</span></div>
+    <div class="row"><span class="label">Data &amp; ERP</span><span>Microsoft Fabric, SQL, Power BI, Git/Azure DevOps, Dynamics 365 Business Central</span></div>
+  </div>
+</section>
+
+<footer class="foot">
+  <p>All diagrams are recreated and sanitized. Hostnames, addresses, domains, account names, and contract details are left out on purpose. A private evidence pack with scripts, change records, and cost models is available for interviews.</p>
+  <p>Education: B.S. Computer Information Systems, Tarleton State University (GPA 4.0) · M.S. Information Systems, Texas Tech University, in progress · CompTIA A+</p>
+</footer>
+
+</div>
+
+</body>
+</html>
